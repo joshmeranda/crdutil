@@ -1,0 +1,64 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: "crdutils.example.com"
+spec:
+  group: example.com
+  scope: Namespaced
+  names:
+    kind: CrdUtil
+    singular: crdutil
+    plural: crdutils
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        description: User is the Schema for the users API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            type: object
+            properties:
+              boolEx:
+                description: An exapmle for a boolean field
+                type: boolean
+              intEx:
+                description: An example for an integer field
+                type: integer
+              floatEx:
+                description: An example for a float field
+                type: number
+              stringEx:
+                description: An exmaple for a string field
+                type: string
+              arrayEx:
+                description: An example for an array field
+                type: array
+                items:
+                  type: string
+              objectEx:
+                description: An example for an object field
+                type: object
+                properties:
+                  nested:
+                    type: string
+                  anotherNested:
+                    type: boolean 
