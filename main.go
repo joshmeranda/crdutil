@@ -39,7 +39,7 @@ func run() error {
 
 	crd, err := crdGetter(context.TODO())
 	if err != nil {
-		return fmt.Errorf("")
+		return fmt.Errorf("could not fetch crd: %w", err)
 	}
 
 	var crdVersion *apiextensionsv1.CustomResourceDefinitionVersion
