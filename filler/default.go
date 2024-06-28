@@ -18,7 +18,7 @@ func (d Default) propValue(prop apiextensionsv1.JSONSchemaProps) (any, error) {
 	case "object":
 		value, err := d.parseProperties(prop.Properties)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to parse object properties: %w", err)
 		}
 
 		return value, nil
@@ -26,6 +26,8 @@ func (d Default) propValue(prop apiextensionsv1.JSONSchemaProps) (any, error) {
 		return "", nil
 	case "integer":
 		return 0, nil
+	case "number":
+		return 0.0, nil
 	case "boolean":
 		return false, nil
 	case "array":
@@ -44,7 +46,6 @@ func (d Default) parseProperties(props map[string]apiextensionsv1.JSONSchemaProp
 			return nil, fmt.Errorf("failed to determine default value: %w", err)
 		}
 
-		fmt.Printf("=== [Default parseProperties] 000 '%s' : '%+v'\n", key, value)
 		data[key] = value
 	}
 
