@@ -61,4 +61,7 @@ spec:
                   nested:
                     type: string
                   anotherNested:
-                    type: boolean 
+                    type: boolean
+          status:
+            description: Status for the crdutil resource
+            type: object
