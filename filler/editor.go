@@ -8,6 +8,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 const (
@@ -29,8 +30,8 @@ func DefaultEditor() (Filler, error) {
 	}, nil
 }
 
-func (e Editor) writeDefaultData(crdVersion *apiextensionsv1.CustomResourceDefinitionVersion) (string, error) {
-	filled, err := Default{}.Fill(crdVersion)
+func (e Editor) writeDefaultData(gvk schema.GroupVersionKind, crdVersion *apiextensionsv1.CustomResourceDefinitionVersion) (string, error) {
+	filled, err := Default{}.Fill(gvk, crdVersion)
 	if err != nil {
 		return "", fmt.Errorf("could not marshal data: %w", err)
 	}
@@ -53,8 +54,8 @@ func (e Editor) writeDefaultData(crdVersion *apiextensionsv1.CustomResourceDefin
 	return tmpFile.Name(), nil
 }
 
-func (e Editor) Fill(crdVersion *apiextensionsv1.CustomResourceDefinitionVersion) (map[string]any, error) {
-	tmpPath, err := e.writeDefaultData(crdVersion)
+func (e Editor) Fill(gvk schema.GroupVersionKind, crdVersion *apiextensionsv1.CustomResourceDefinitionVersion) (map[string]any, error) {
+	tmpPath, err := e.writeDefaultData(gvk, crdVersion)
 	if err != nil {
 		return nil, fmt.Errorf("could not write default data: %w", err)
 	}

@@ -9,6 +9,7 @@ import (
 	"github.com/joshmeranda/crdutil/filler"
 	"github.com/joshmeranda/crdutil/getter"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 var (
@@ -49,11 +50,17 @@ func run() error {
 		}
 	}
 
+	gvk := schema.GroupVersionKind{
+		Group:   crd.Spec.Group,
+		Version: crdVersion.Name,
+		Kind:    crd.Spec.Names.Kind,
+	}
+
 	if crdVersion == nil {
 		return fmt.Errorf("crd had no matching crd versions '%s'", CrdVersion)
 	}
 
-	data, err := f.Fill(crdVersion)
+	data, err := f.Fill(gvk, crdVersion)
 	if err != nil {
 		return fmt.Errorf("could not fill data: %w", err)
 	}

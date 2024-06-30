@@ -2,9 +2,30 @@ package filler
 
 import (
 	"fmt"
+	"reflect"
+	"strings"
 
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
+
+func setIfAbsentZeroedOrEmpty(data map[string]any, key string, newValue any) {
+	value, found := data[key]
+	if !found {
+		data[key] = newValue
+	}
+
+	oldType := reflect.TypeOf(value)
+
+	if !reflect.ValueOf(value).IsZero() {
+		if oldType.Kind() == reflect.Map && len(value.(map[string]any)) > 0 {
+			fmt.Printf("=== [setIfAbsentZeroedOrEmpty] 000 ===\n")
+			return
+		}
+	}
+
+	data[key] = newValue
+}
 
 type Default struct {
 }
@@ -52,11 +73,17 @@ func (d Default) parseProperties(props map[string]apiextensionsv1.JSONSchemaProp
 	return data, nil
 }
 
-func (d Default) Fill(crdVersion *apiextensionsv1.CustomResourceDefinitionVersion) (map[string]any, error) {
+func (d Default) Fill(gvk schema.GroupVersionKind, crdVersion *apiextensionsv1.CustomResourceDefinitionVersion) (map[string]any, error) {
 	data, err := d.parseProperties(crdVersion.Schema.OpenAPIV3Schema.Properties)
 	if err != nil {
 		return nil, fmt.Errorf("could not parse properties: %w", err)
 	}
+
+	setIfAbsentZeroedOrEmpty(data, "apiVersion", gvk.GroupVersion().String())
+	setIfAbsentZeroedOrEmpty(data, "kind", gvk.Kind)
+	setIfAbsentZeroedOrEmpty(data, "metadata", map[string]any{"name": strings.ToLower(gvk.Kind) + "-example"})
+
+	delete(data, "status")
 
 	return data, nil
 }
